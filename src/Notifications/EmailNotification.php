@@ -50,8 +50,11 @@ class EmailNotification implements NotificationInterface {
             $mail->SMTPAuth = true;
             $mail->Username = $_ENV['MAIL_USERNAME'];
             $mail->Password = $_ENV['MAIL_PASSWORD'];
-            $mail->SMTPSecure = $_ENV['MAIL_ENCRYPTION'];
             $mail->Port = $_ENV['MAIL_PORT'];
+            
+            if (!empty($_ENV['MAIL_ENCRYPTION'])) {
+                $mail->SMTPSecure = $_ENV['MAIL_ENCRYPTION'];
+            }
 
             $mail->setFrom($_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME']);
             $mail->addAddress($this->to);
