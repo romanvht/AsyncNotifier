@@ -51,7 +51,7 @@ class EmailNotification implements NotificationInterface {
             $mail->Username = $_ENV['MAIL_USERNAME'];
             $mail->Password = $_ENV['MAIL_PASSWORD'];
             $mail->Port = $_ENV['MAIL_PORT'];
-            
+
             if (!empty($_ENV['MAIL_ENCRYPTION'])) {
                 $mail->SMTPSecure = $_ENV['MAIL_ENCRYPTION'];
             }
@@ -66,16 +66,22 @@ class EmailNotification implements NotificationInterface {
             $result = $mail->send();
             
             if (!$result) {
-                $this->logger->error('Failed to send email', ['to' => $this->to, 'error' => $mail->ErrorInfo]);
+                $this->logger->error('Failed to send email', [
+                    'to' => $this->to, 
+                    'error' => $mail->ErrorInfo
+                ]);
+
+                return false;
             }
 
-            return $result;
+            return true;
         } catch (Exception $e) {
             $this->logger->error('Exception while sending email', [
                 'to' => $this->to,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+
             return false;
         }
     }
