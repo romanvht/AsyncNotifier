@@ -4,8 +4,7 @@ namespace App\Services;
 
 use Predis\Client;
 
-class RedisService
-{
+class RedisService {
     private $client;
 
     public function __construct()

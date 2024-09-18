@@ -4,8 +4,7 @@ namespace App\Queue;
 
 use App\Services\RedisService;
 
-class Queue
-{
+class Queue {
     private $redis;
     private $queueName = 'notifications';
 
