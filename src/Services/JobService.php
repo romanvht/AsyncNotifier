@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use React\Promise\Promise;
@@ -18,25 +17,15 @@ class JobService {
         return new Promise(function ($resolve, $reject) use ($job) {
             $this->logger->info('Processing job', $job);
             
-            switch ($job['type']) {
-                case 'email':
-                    $notification = new \App\Notifications\EmailNotification(
-                        $job['data']['to'],
-                        $job['data']['subject'],
-                        $job['data']['body']
-                    );
-                    break;
-                case 'telegram':
-                    $notification = new \App\Notifications\TelegramNotification(
-                        $job['data']['chat_id'],
-                        $job['data']['message']
-                    );
-                    break;
-                default:
-                    $this->logger->error('Unknown job type', $job);
-                    $reject('Unknown job type');
-                    return;
+            $notificationClass = $this->getNotificationClass($job['type']);
+
+            if ($notificationClass === null) {
+                $this->logger->error('Unknown job type', $job);
+                $reject('Unknown job type');
+                return;
             }
+            
+            $notification = new $notificationClass($job['data']);
             
             try {
                 $result = $notification->send();
@@ -57,5 +46,16 @@ class JobService {
                 $reject('Exception while sending notification: ' . $e->getMessage());
             }
         });
+    }
+
+    public function getNotificationClass(string $type): ?string
+    {
+        $className = 'App\\Notifications\\' . ucfirst($type) . 'Notification';
+
+        if (class_exists($className)) {
+            return $className;
+        }
+
+        return null;
     }
 }

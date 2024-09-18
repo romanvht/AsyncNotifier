@@ -13,10 +13,10 @@ class TelegramNotification implements NotificationInterface {
     private $message;
     private $logger;
 
-    public function __construct(string $chatId, string $message)
+    public function __construct(array $data)
     {
-        $this->chatId = $chatId;
-        $this->message = $message;
+        $this->chatId = isset($data['chat_id']) ? $data['chat_id'] : null;
+        $this->message = isset($data['message']) ? $data['message'] : null;
 
         $this->initLogger();
     }
@@ -28,8 +28,18 @@ class TelegramNotification implements NotificationInterface {
         $this->logger->pushHandler(new StreamHandler(__DIR__ . '/../../logs/telegram_errors.log', Logger::DEBUG));
     }
 
+    public function validate(): bool
+    {
+        return !empty($this->chatId) && !empty($this->message);
+    }
+
     public function send(): bool
     {
+        if (!$this->validate()) {
+            $this->logger->warning('Attempt to send Telegram message with invalid data');
+            return false;
+        }
+
         $client = new Client();
 
         try {

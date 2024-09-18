@@ -14,11 +14,11 @@ class EmailNotification implements NotificationInterface {
     private $body;
     private $logger;
 
-    public function __construct(string $to, string $subject, string $body)
+    public function __construct(array $data)
     {
-        $this->to = $to;
-        $this->subject = $subject;
-        $this->body = $body;
+        $this->to = isset($data['to']) ? $data['to'] : null;
+        $this->subject = isset($data['subject']) ? $data['subject'] : null;
+        $this->body = isset($data['body']) ? $data['body'] : null;
 
         $this->initLogger();
     }
@@ -30,8 +30,18 @@ class EmailNotification implements NotificationInterface {
         $this->logger->pushHandler(new StreamHandler(__DIR__ . '/../../logs/email_errors.log', Logger::DEBUG));
     }
 
+    public function validate(): bool
+    {
+        return filter_var($this->to, FILTER_VALIDATE_EMAIL) !== false && !empty($this->subject) && !empty($this->body);
+    }    
+
     public function send(): bool
     {
+        if (!$this->validate()) {
+            $this->logger->warning('Attempt to send Email with invalid data');
+            return false;
+        }
+
         $mail = new PHPMailer(true);
 
         try {
