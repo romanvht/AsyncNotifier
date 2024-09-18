@@ -53,7 +53,7 @@ class TelegramNotification implements NotificationInterface {
             $statusCode = $response->getStatusCode();
             $body = json_decode($response->getBody(), true);
 
-            if ($statusCode === 200 || !isset($body['ok'])) {
+            if ($statusCode !== 200 || !isset($body['ok'])) {
                 $this->logger->error('Failed to send Telegram message', [
                     'chat_id' => $this->chatId,
                     'status_code' => $statusCode,
@@ -70,7 +70,7 @@ class TelegramNotification implements NotificationInterface {
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return false;
         }
     }
