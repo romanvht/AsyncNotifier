@@ -9,8 +9,8 @@
 
 1. Клонируйте репозиторий:
     ```sh
-    git clone https://github.com/ваш-пользователь/ваш-репозиторий.git
-    cd ваш-репозиторий
+    git clone https://github.com/romanvht/AsyncNotifier.git
+    cd AsyncNotifier
     ```
 
 2. Установите зависимости с помощью Composer:
